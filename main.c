@@ -12,26 +12,59 @@
 #include "sensor_Ta.h"
 #include "sensor_Ti.h"
 #include "sensor_No.h"
+#include "atuador_Na.h"
+#include "atuador_Ni.h"
 #include "tela.h"
 
 double H_ref;
 double T_ref;
 
 _Noreturn void thread_controle_T(void) {
-    struct timespec t;
+    struct timespec time;
     int periodo = 50000000;    // 50ms
-    t.tv_nsec = t.tv_nsec + periodo;
+    time.tv_nsec = time.tv_nsec + periodo;
+    double t, h, ret, No;
+    char msg_enviada[1000];
+
+    double P = 1000;    // peso específico da água [1000 Kg/m3]
+    double S = 4184;    // calor específico da água [4184 Joule/Kg.Celsius]
+    double B = 4;       // área da base do recipiente [4 m2]
+    double C;           // capacitância térmica da água no recipiente [Joule/Celsius]
+
+
+
     while (1) {
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
+        t = sensor_T_get();
+        h = sensor_H_get();
+        No = sensor_No_get();
+        if(t < T_ref){
+            C = S * P * B * h;
+            sprintf(msg_enviada, "aq-%lf", 1000000.0);
+            ret = msg_socket(msg_enviada);
+            if (No > 0){
+
+                sprintf(msg_enviada, "ani%lf", Ni);
+                ret = msg_socket(msg_enviada);
+
+                sprintf(msg_enviada, "ana%lf", Na);
+                ret = msg_socket(msg_enviada);
+            }
+
+        }
+        if(t >= T_ref){
+            sprintf(msg_enviada, "aq-%lf", 0.0);
+            ret = msg_socket(msg_enviada);
+        }
 
     }
-
 }
 
 _Noreturn void thread_controle_H(void) {
     struct timespec time;
     int periodo = 70000000;    // 70ms
     time.tv_nsec = time.tv_nsec + periodo;
-    double t, ta, ti, No, h, Ni, Na, l, ret, dh;
+    double t, ti, No, h, Ni, Na, l, ret, dh;
 
     char msg_enviada[1000];
 
@@ -39,35 +72,46 @@ _Noreturn void thread_controle_H(void) {
 
         clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
 
-        t = sensor_T_get();
-        ta = sensor_Ta_get();
-        ti = sensor_Ti_get();
-        No = sensor_No_get();
         h = sensor_H_get();
-        dh = ((H_ref - h) / H_ref) + 1;
-        if (h < H_ref) {
+
+        if (h < H_ref && (h / H_ref) < 0.99) {
+            t = sensor_T_get();
+            ti = sensor_Ti_get();
+            No = sensor_No_get();
+            dh = ((H_ref - h) / H_ref) + 1;
             l = (80 - t) / (ti - t);
-            Na = (No / (l + 1)) * dh;
-            Ni = (l * Na) * dh;
+            if (No == 0){
+                atuador_Na_put((10.0 / (l + 1)) * dh)
+                Ni = (l * Na) * dh;
 
-            sprintf( msg_enviada, "ani%lf", Ni);
-            ret = msg_socket(msg_enviada);
 
-            sprintf( msg_enviada, "ana%lf", Na);
-            ret = msg_socket(msg_enviada);
+                sprintf(msg_enviada, "ani%lf", Ni);
+                ret = msg_socket(msg_enviada);
 
-            aloca_tela();
-            printf("\33[H\33[2J");
-            printf("dh: %.2lf ",dh);
-            libera_tela();
+                sprintf(msg_enviada, "ana%lf", Na);
+                ret = msg_socket(msg_enviada);
+            } else
+                Na = (No / (l + 1)) * dh;
+                Ni = (l * Na) * dh;
+
+                sprintf(msg_enviada, "ani%lf", Ni);
+                ret = msg_socket(msg_enviada);
+
+                sprintf(msg_enviada, "ana%lf", Na);
+                ret = msg_socket(msg_enviada);
+        }else {
+            if ((h / H_ref) >= 0.99){
+                Na = 0.0;
+                Ni = 0.0;
+
+                sprintf(msg_enviada, "ani%lf", Ni);
+                ret = msg_socket(msg_enviada);
+
+                sprintf(msg_enviada, "ana%lf", Na);
+                ret = msg_socket(msg_enviada);
+            }
         }
     }
-}
-
-double v_abs(double x){
-    if (x < 0){
-        return (-x);
-    } else return (x);
 }
 
 _Noreturn void thread_status(void) {
@@ -146,16 +190,18 @@ int main(int argc, char *argv[]) {
     fgets(teclado, 1000, stdin);
     T_ref = atof(&teclado[0]);
 
-    pthread_t t1, t2, t3, t4;
+    pthread_t t1, t2, t3, t4, t5;
 
     pthread_create(&t1, NULL, (void *) thread_status, NULL);
     pthread_create(&t2, NULL, (void *) thread_le_sensor, NULL);
     pthread_create(&t3, NULL, (void *) thread_alarme_T, NULL);
     pthread_create(&t4, NULL, (void *) thread_controle_H, NULL);
+    pthread_create(&t5, NULL, (void *) thread_controle_T, NULL);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
     pthread_join(t3, NULL);
     pthread_join(t4, NULL);
+    pthread_join(t5, NULL);
 
 }
