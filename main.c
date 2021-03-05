@@ -14,59 +14,84 @@
 #include "sensor_No.h"
 #include "atuador_Na.h"
 #include "atuador_Ni.h"
+#include "atuador_Nf.h"
 #include "tela.h"
 
 double H_ref;
 double T_ref;
 
 _Noreturn void thread_controle_T(void) {
+
     struct timespec time;
     int periodo = 50000000;    // 50ms
     time.tv_nsec = time.tv_nsec + periodo;
-    double t, h, ret, No;
+    double t, Q;
     char msg_enviada[1000];
 
-    double P = 1000;    // peso específico da água [1000 Kg/m3]
-    double S = 4184;    // calor específico da água [4184 Joule/Kg.Celsius]
-    double B = 4;       // área da base do recipiente [4 m2]
-    double C;           // capacitância térmica da água no recipiente [Joule/Celsius]
-
-
+    double R = 0.001;   // resistência térmica do isolamento (2mm madeira) [0.001 Grau / (Joule/segundo)]
+    double Qe;          // fluxo de calor através do isolamento do recipiente [Joule/segundo]
 
     while (1) {
+
         clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &time, NULL);
+
+        Qe = (sensor_T_get() - sensor_Ta_get()) / R;
+
+        if (Qe > 1000000.0){
+            Q = 1000000.0;
+        } else {
+            Q = Qe;
+        }
+        sprintf(msg_enviada, "aq-%lf", Q);
+        msg_socket(msg_enviada);
+
         t = sensor_T_get();
-        h = sensor_H_get();
-        No = sensor_No_get();
-        if(t < T_ref){
-            C = S * P * B * h;
+
+        if (t < T_ref) {
             sprintf(msg_enviada, "aq-%lf", 1000000.0);
-            ret = msg_socket(msg_enviada);
-            if (No > 0){
+            msg_socket(msg_enviada);
 
-                sprintf(msg_enviada, "ani%lf", Ni);
-                ret = msg_socket(msg_enviada);
+            if (atuador_Na_get() < 10){
 
-                sprintf(msg_enviada, "ana%lf", Na);
-                ret = msg_socket(msg_enviada);
+                atuador_Ni_put(atuador_Ni_get() + 10 - atuador_Na_get());
+                sprintf(msg_enviada, "anf%lf", atuador_Nf_get());
+                msg_socket(msg_enviada);
+
+                atuador_Na_put(atuador_Nf_get() + 10 - atuador_Na_get());
+                sprintf(msg_enviada, "ana%lf", atuador_Na_get());
+                msg_socket(msg_enviada);
             }
-
         }
-        if(t >= T_ref){
-            sprintf(msg_enviada, "aq-%lf", 0.0);
-            ret = msg_socket(msg_enviada);
+        if (t >= T_ref) {
+            Q = Qe;
+            sprintf(msg_enviada, "aq-%lf", Q);
+            msg_socket(msg_enviada);
         }
+    }
+}
 
+double v_abs(double x) {
+    if (x < 0) {
+        return -x;
+    }
+    if (x >= 0) {
+        return x;
     }
 }
 
 _Noreturn void thread_controle_H(void) {
     struct timespec time;
     int periodo = 70000000;    // 70ms
-    time.tv_nsec = time.tv_nsec + periodo;
-    double t, ti, No, h, Ni, Na, l, ret, dh;
+    time.tv_nsec = time.tv_nsec + periodo - 70000000;
+    double t, ti, Ni, Na, No, Nf, h, l, dh, dNi, dNa;
 
     char msg_enviada[1000];
+
+    sprintf(msg_enviada, "ani%lf", 0.0);
+    msg_socket(msg_enviada);
+
+    sprintf(msg_enviada, "ana%lf", 0.0);
+    msg_socket(msg_enviada);
 
     while (1) {
 
@@ -74,41 +99,78 @@ _Noreturn void thread_controle_H(void) {
 
         h = sensor_H_get();
 
-        if (h < H_ref && (h / H_ref) < 0.99) {
+        if ((h < H_ref) && ((h / H_ref) < 0.99)) {
             t = sensor_T_get();
             ti = sensor_Ti_get();
             No = sensor_No_get();
+            Nf = atuador_Nf_get();
             dh = ((H_ref - h) / H_ref) + 1;
-            l = (80 - t) / (ti - t);
-            if (No == 0){
-                atuador_Na_put((10.0 / (l + 1)) * dh)
-                Ni = (l * Na) * dh;
+            l = v_abs((ti - t) / (80 - t));
+            if (No == 0 && Nf == 0) {
 
+                Ni = 50.0 * dh;
+                Na = l * Ni;
 
-                sprintf(msg_enviada, "ani%lf", Ni);
-                ret = msg_socket(msg_enviada);
+                if (Ni > 100){
+                    dNi = 100 / Ni;
+                    Ni = dNi * Ni;
+                    Na = dNi * Na;
+                }
 
-                sprintf(msg_enviada, "ana%lf", Na);
-                ret = msg_socket(msg_enviada);
-            } else
-                Na = (No / (l + 1)) * dh;
-                Ni = (l * Na) * dh;
+                if (Na > 10){
+                    dNa = 10 / Na;
+                    Ni = dNa * Ni;
+                    Na = dNa * Na;
+                }
 
-                sprintf(msg_enviada, "ani%lf", Ni);
-                ret = msg_socket(msg_enviada);
+                atuador_Ni_put(Ni);
+                atuador_Na_put(Na);
 
-                sprintf(msg_enviada, "ana%lf", Na);
-                ret = msg_socket(msg_enviada);
-        }else {
-            if ((h / H_ref) >= 0.99){
-                Na = 0.0;
-                Ni = 0.0;
+                sprintf(msg_enviada, "ani%lf", atuador_Ni_get());
+                msg_socket(msg_enviada);
 
-                sprintf(msg_enviada, "ani%lf", Ni);
-                ret = msg_socket(msg_enviada);
+                sprintf(msg_enviada, "ana%lf", atuador_Na_get());
+                msg_socket(msg_enviada);
 
-                sprintf(msg_enviada, "ana%lf", Na);
-                ret = msg_socket(msg_enviada);
+            } else {
+
+                Ni = ((No + Nf) / (l + 1)) * dh * 10;
+                Na = l * atuador_Ni_get();
+
+                if (Ni > 100){
+                    dNi = 100 / Ni;
+                    Ni = dNi * Ni;
+                    Na = dNi * Na;
+                }
+
+                if (Na > 10){
+                    dNa = 10 / Na;
+                    Ni = dNa * Ni;
+                    Na = dNa * Na;
+                }
+                atuador_Ni_put(Ni);
+                atuador_Na_put(Na);
+
+                sprintf(msg_enviada, "ani%lf", atuador_Ni_get());
+                msg_socket(msg_enviada);
+
+                sprintf(msg_enviada, "ana%lf", atuador_Na_get());
+                msg_socket(msg_enviada);
+            }
+        } else {
+            if (atuador_Nf_get() + No != atuador_Na_get() + atuador_Ni_get()) {
+                atuador_Na_put(0.0);
+                atuador_Ni_put(0.0);
+                atuador_Nf_put(0.0);
+
+                sprintf(msg_enviada, "ani%lf", atuador_Ni_get());
+                msg_socket(msg_enviada);
+
+                sprintf(msg_enviada, "ana%lf", atuador_Na_get());
+                msg_socket(msg_enviada);
+
+                sprintf(msg_enviada, "anf%lf", atuador_Na_get());
+                msg_socket(msg_enviada);
             }
         }
     }

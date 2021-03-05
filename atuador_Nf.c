@@ -2,7 +2,7 @@
 // Created by jeferson on 04/03/2021.
 //
 
-#include "atuador_Na.h"
+#include "atuador_Nf.h"
 #include <math.h>
 #include <pthread.h>
 
@@ -11,7 +11,7 @@ static pthread_cond_t alarme = PTHREAD_COND_INITIALIZER;
 static double atuador_lido = 0;
 static double limite_atual = HUGE_VAL;
 
-void atuador_Na_put( double lido) {
+void atuador_Nf_put( double lido) {
     pthread_mutex_lock( &exclusao_mutua);
     atuador_lido = lido;
     if( atuador_lido >= limite_atual)
@@ -19,7 +19,7 @@ void atuador_Na_put( double lido) {
     pthread_mutex_unlock( &exclusao_mutua);
 }
 
-double atuador_Na_get( void) {
+double atuador_Nf_get( void) {
     double aux;
     pthread_mutex_lock( &exclusao_mutua);
     aux = atuador_lido;
