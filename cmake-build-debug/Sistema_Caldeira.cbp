@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Sistema_Caldeira"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Sistema_Caldeira">
+				<Option output="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Sistema_Caldeira" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/jeferson/CLionProjects/Sistema_Caldeira/."/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 Sistema_Caldeira"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Sistema_Caldeira/fast">
+				<Option output="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Sistema_Caldeira" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/jeferson/CLionProjects/Sistema_Caldeira/."/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 Sistema_Caldeira/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/atuador_Na.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/atuador_Na.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/atuador_Nf.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/atuador_Nf.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/atuador_Ni.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/atuador_Ni.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/main.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_H.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_H.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_No.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_No.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_T.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_T.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_Ta.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_Ta.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_Ti.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensor_Ti.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensores_bufduplo.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/sensores_bufduplo.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/socket.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/socket.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/tela.c">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/tela.h">
+			<Option target="Sistema_Caldeira"/>
+		</Unit>
+		<Unit filename="/home/jeferson/CLionProjects/Sistema_Caldeira/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

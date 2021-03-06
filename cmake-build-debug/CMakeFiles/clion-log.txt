@@ -1,0 +1,10 @@
+/home/jeferson/apps/CLion/ch-1/211.6305.15/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/jeferson/CLionProjects/Sistema_Caldeira
+-- The C compiler identification is GNU 9.3.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/jeferson/CLionProjects/Sistema_Caldeira/cmake-build-debug

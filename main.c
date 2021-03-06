@@ -1,30 +1,53 @@
+//
+// Created by jeferson on 05/03/2021.
+//
 
-//Definicao de Bibliotecas
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 
-#include "socket.h"
-#include "sensor_H.h"
-#include "sensor_T.h"
-#include "sensor_Ta.h"
-#include "sensor_Ti.h"
-#include "sensor_No.h"
-#include "atuador_Na.h"
-#include "atuador_Ni.h"
-#include "atuador_Nf.h"
+#include "Sensores/sensor_H.h"
+#include "Sensores/sensor_T.h"
+#include "Sensores/sensor_Ta.h"
+#include "Sensores/sensor_Ti.h"
+#include "Sensores/sensor_No.h"
+#include "Atuadores/atuador_Na.h"
+#include "Atuadores/atuador_Ni.h"
+#include "Atuadores/atuador_Nf.h"
 #include "tela.h"
+#include "socket.h"
+
+#include "sensores_bufduplo.h"
+#include "tempo_resp_h_bufduplo.h"
+#include "tempo_resp_t_bufduplo.h"
+
+#define NSEC_PER_SEC (1000000000) 	// Numero de nanosegundos em um segundo
 
 double H_ref;
 double T_ref;
 
+double v_abs(double x) {
+    if (x < 0) {
+        return -x;
+    }
+    if (x >= 0) {
+        return x;
+    }
+}
+
 _Noreturn void thread_controle_T(void) {
 
-    struct timespec time;
+    struct timespec time, time_end;
     int periodo = 50000000;    // 50ms
-    time.tv_nsec = time.tv_nsec + periodo;
+
+    // Le o tempo atual, coloca em time
+    clock_gettime(CLOCK_MONOTONIC ,&time);
+
+    // Tarefa periodica iniciará em 1 segundo
+    time.tv_sec++;
+
     double t, Q;
     char msg_enviada[1000];
 
@@ -67,22 +90,35 @@ _Noreturn void thread_controle_T(void) {
             sprintf(msg_enviada, "aq-%lf", Q);
             msg_socket(msg_enviada);
         }
+
+        // Le a hora atual, coloca em time_end
+        clock_gettime(CLOCK_MONOTONIC ,&time_end);
+
+        // Calcula o tempo de resposta observado em microsegundos
+        tempo_resp_t_bufduplo_insereLeitura((1000000 * (time_end.tv_sec - time.tv_sec)) +
+                                                    ((time_end.tv_nsec - time.tv_nsec) / 1000));
+
+        // Calcula inicio do proximo periodo
+        time.tv_nsec += periodo;
+        while (time.tv_nsec >= NSEC_PER_SEC) {
+            time.tv_nsec -= NSEC_PER_SEC;
+            time.tv_sec++;
+        }
     }
 }
 
-double v_abs(double x) {
-    if (x < 0) {
-        return -x;
-    }
-    if (x >= 0) {
-        return x;
-    }
-}
+
 
 _Noreturn void thread_controle_H(void) {
-    struct timespec time;
+    struct timespec time, time_end;
     int periodo = 70000000;    // 70ms
-    time.tv_nsec = time.tv_nsec + periodo - 70000000;
+
+    // Le o tempo atual, coloca em time
+    clock_gettime(CLOCK_MONOTONIC ,&time);
+
+    // Tarefa periodica iniciará em 1 segundo
+    time.tv_sec++;
+
     double t, ti, Ni, Na, No, Nf, h, l, dh, dNi, dNa;
 
     char msg_enviada[1000];
@@ -173,30 +209,51 @@ _Noreturn void thread_controle_H(void) {
                 msg_socket(msg_enviada);
             }
         }
+
+        clock_gettime(CLOCK_MONOTONIC ,&time_end);
+
+        // Calcula o tempo de resposta observado em microsegundos
+        tempo_resp_h_bufduplo_insereLeitura((1000000 * (time_end.tv_sec - time.tv_sec)) +
+                                                    ((time_end.tv_nsec - time.tv_nsec) / 1000));
+
+        // Calcula inicio do proximo periodo
+        time.tv_nsec += periodo;
+        while (time.tv_nsec >= NSEC_PER_SEC) {
+            time.tv_nsec -= NSEC_PER_SEC;
+            time.tv_sec++;
+        }
     }
 }
 
 _Noreturn void thread_status(void) {
     double t, ta, ti, No, h;
     while (1) {
+
         t = sensor_T_get();
+        sensores_bufduplo_insereLeitura(t);
+
         ta = sensor_Ta_get();
+
         ti = sensor_Ti_get();
+
         No = sensor_No_get();
+        sensores_bufduplo_insereLeitura(No);
+
         h = sensor_H_get();
+        sensores_bufduplo_insereLeitura(h);
+
         aloca_tela();
         printf("\33[H\33[2J");
         printf("----------------------------------------\n");
         printf("|Temperatura no interior (T)\t--> %.2lf\n", t);
         printf("|Altura da Coluna(H)\t\t--> %.2lf\n", h);
-        printf("|T: Ambiente em volta (Ta)\t--> %.2lf\n", ta);
-        printf("|T: Água que entra (Ti)\t\t--> %.2lf\n", ti);
+        printf("|Ambiente em volta (Ta)\t\t--> %.2lf\n", ta);
+        printf("|Água que entra (Ti)\t\t--> %.2lf\n", ti);
         printf("|Fluxo de Saída (No)\t\t--> %.2lf\n", No);
         printf("----------------------------------------\n");
 
         libera_tela();
         sleep(1);
-        //
     }
 }
 
@@ -214,7 +271,7 @@ _Noreturn void thread_alarme_T(void) {
     }
 }
 
-_Noreturn void thread_le_sensor(void) {
+_Noreturn void thread_le_sensores(void) {
     char msg_enviada[1000];
     while (1) {
         strcpy(msg_enviada, "st-0");
@@ -234,10 +291,6 @@ _Noreturn void thread_le_sensor(void) {
     }
 }
 
-///Controle
-
-
-
 int main(int argc, char *argv[]) {
 
     cria_socket(argv[1], atoi(argv[2]));
@@ -252,18 +305,24 @@ int main(int argc, char *argv[]) {
     fgets(teclado, 1000, stdin);
     T_ref = atof(&teclado[0]);
 
-    pthread_t t1, t2, t3, t4, t5;
+    pthread_t t_status, t_le_sensores, t_alarme_T, t_controle_H, t_controle_T, t_sensores_bufduplo, t_tempo_resp_h,
+                t_tempo_resp_t;
 
-    pthread_create(&t1, NULL, (void *) thread_status, NULL);
-    pthread_create(&t2, NULL, (void *) thread_le_sensor, NULL);
-    pthread_create(&t3, NULL, (void *) thread_alarme_T, NULL);
-    pthread_create(&t4, NULL, (void *) thread_controle_H, NULL);
-    pthread_create(&t5, NULL, (void *) thread_controle_T, NULL);
+    pthread_create(&t_status, NULL, (void *) thread_status, NULL);
+    pthread_create(&t_le_sensores, NULL, (void *) thread_le_sensores, NULL);
+    pthread_create(&t_alarme_T, NULL, (void *) thread_alarme_T, NULL);
+    pthread_create(&t_controle_H, NULL, (void *) thread_controle_H, NULL);
+    pthread_create(&t_controle_T, NULL, (void *) thread_controle_T, NULL);
+    pthread_create(&t_sensores_bufduplo, NULL, (void *) sensores_bufduplo_esperaBufferCheio, NULL);
+    pthread_create(&t_tempo_resp_h, NULL, (void *) tempo_resp_h_bufduplo_esperaBufferCheio, NULL);
+    pthread_create(&t_tempo_resp_t, NULL, (void *) tempo_resp_t_bufduplo_esperaBufferCheio, NULL);
 
-    pthread_join(t1, NULL);
-    pthread_join(t2, NULL);
-    pthread_join(t3, NULL);
-    pthread_join(t4, NULL);
-    pthread_join(t5, NULL);
-
+    pthread_join(t_status, NULL);
+    pthread_join(t_le_sensores, NULL);
+    pthread_join(t_alarme_T, NULL);
+    pthread_join(t_controle_H, NULL);
+    pthread_join(t_controle_T, NULL);
+    pthread_join(t_sensores_bufduplo, NULL);
+    pthread_join(t_tempo_resp_h, NULL);
+    pthread_join(t_tempo_resp_t, NULL);
 }
