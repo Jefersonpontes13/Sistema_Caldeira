@@ -107,8 +107,6 @@ _Noreturn void thread_controle_T(void) {
     }
 }
 
-
-
 _Noreturn void thread_controle_H(void) {
     struct timespec time, time_end;
     int periodo = 70000000;    // 70ms
