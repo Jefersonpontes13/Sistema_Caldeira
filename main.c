@@ -84,9 +84,9 @@ _Noreturn void thread_controle_T(void) {
         sprintf(msg_enviada, "aq-%lf", Q);
         msg_socket(msg_enviada);
 
-        aloca_tela();
+        /*aloca_tela();
         printf("Q %f\n", Q);
-        libera_tela();
+        libera_tela();*/
 
         t = sensor_T_get();
 
@@ -105,10 +105,10 @@ _Noreturn void thread_controle_T(void) {
                 sprintf(msg_enviada, "ana%lf", atuador_Na_get());
                 msg_socket(msg_enviada);
 
-                aloca_tela();
+                /*aloca_tela();
                 printf("T %.3f T_ref %.3f Na %.3f Ni %.3f Nf %.3f\n",sensor_T_get(), get_ref_T(), atuador_Na_get(),
                        atuador_Ni_get(), atuador_Nf_get());
-                libera_tela();
+                libera_tela();*/
             }
         }
         //  Ajusta o valor de Q caso a temperatura não seja menor que a referência
