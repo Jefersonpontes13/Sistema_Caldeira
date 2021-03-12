@@ -245,6 +245,11 @@ _Noreturn void thread_controle_H(void) {
                 sprintf(msg_enviada, "anf%lf", atuador_Na_get());
                 msg_socket(msg_enviada);
             }
+            if (sensor_H_get() > H_ref) {
+                atuador_Nf_put(100.0);
+                sprintf(msg_enviada, "anf%lf", atuador_Na_get());
+                msg_socket(msg_enviada);
+            }
         }
 
         clock_gettime(CLOCK_MONOTONIC, &time_end);
